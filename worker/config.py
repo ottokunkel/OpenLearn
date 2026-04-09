@@ -32,6 +32,10 @@ class Settings:
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
     embedding_batch_size: int = 100
+    # Supabase / Postgres (set database_url to enable, replaces Redis)
+    database_url: str = ""
+    supabase_url: str = ""
+    supabase_service_key: str = ""
 
 
 def load_settings() -> Settings:
@@ -56,4 +60,7 @@ def load_settings() -> Settings:
         embedding_model=os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small"),
         embedding_dimensions=int(os.environ.get("EMBEDDING_DIMENSIONS", "1536")),
         embedding_batch_size=int(os.environ.get("EMBEDDING_BATCH_SIZE", "100")),
+        database_url=os.environ.get("DATABASE_URL", ""),
+        supabase_url=os.environ.get("SUPABASE_URL", ""),
+        supabase_service_key=os.environ.get("SUPABASE_SERVICE_KEY", ""),
     )
