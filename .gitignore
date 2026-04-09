@@ -1,4 +1,8 @@
+# Environment
 .env
+.env.local
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -8,9 +12,22 @@ build/
 .eggs/
 *.egg
 .venv/
-.DS_Store
 venv/
 .mypy_cache/
 .pytest_cache/
-benchmark/data/results.json
-benchmark/data/documents/*.json
+
+# Node
+node_modules/
+.next/
+.turbo/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Benchmark data
+services/document-worker/benchmark/data/results.json
+services/document-worker/benchmark/data/documents/*.json

@@ -13,13 +13,13 @@ services:
     profiles:
       - redis
 
-  worker:
-    build: .
-    env_file: .env
+  document-worker:
+    build: services/document-worker
+    env_file: services/document-worker/.env
     restart: unless-stopped
-    # When using Redis mode, start with: docker compose --profile redis up
-    # When using Supabase/pgmq mode, start with: docker compose up worker
-    # Scale horizontally: docker compose up --scale worker=3
+    # Redis mode: docker compose --profile redis up
+    # Supabase/pgmq mode: docker compose up document-worker
+    # Scale: docker compose up --scale document-worker=3
 
 volumes:
   redis-data:
