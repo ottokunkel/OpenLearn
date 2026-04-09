@@ -1,0 +1,16 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+.DS_Store
+venv/
+.mypy_cache/
+.pytest_cache/
+benchmark/data/results.json
+benchmark/data/documents/*.json
