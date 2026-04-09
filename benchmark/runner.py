@@ -30,12 +30,8 @@ def resolve_api_key(model_cfg: dict) -> str:
 
 
 def build_settings(model_cfg: dict) -> Settings:
-    """Build a Settings from a single model config entry. Supabase fields are unused dummies."""
+    """Build a Settings from a single model config entry. Redis/S3 fields are unused."""
     return Settings(
-        supabase_url="https://unused.supabase.co",
-        supabase_service_key="unused",
-        source_bucket="unused",
-        output_bucket="unused",
         openrouter_api_key=resolve_api_key(model_cfg),
         vlm_model=model_cfg.get("name", "qwen/qwen3.5-flash-02-23"),
         openrouter_base_url=model_cfg.get("base_url", "https://openrouter.ai/api/v1"),
@@ -67,7 +63,7 @@ def run_single(
 
     start = time.perf_counter()
     with tracker.track():
-        result = converter.convert_pdf(
+        conversion = converter.convert_pdf(
             pdf_path,
             on_retry=on_retry,
             on_error=on_error,
@@ -76,6 +72,7 @@ def run_single(
         )
     elapsed = time.perf_counter() - start
 
+    result = conversion.to_dict()
     doc_dict = result["doc_dict"]
     markdown = result["markdown"]
     chunks = result.get("chunks", [])

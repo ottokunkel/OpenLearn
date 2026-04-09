@@ -463,7 +463,7 @@ class BenchmarkTUI(App):
         for chunk in chunks:
             headings = chunk.get("headings") or []
             label = chunk.get("label", "")
-            page = chunk.get("page")
+            page = chunk.get("page_no")
             text = chunk.get("text", "")
 
             # Create/find heading branch nodes
@@ -504,8 +504,8 @@ class BenchmarkTUI(App):
             lines.append(f"[b]Path:[/b]    {' > '.join(headings)}")
         if chunk.get("label"):
             lines.append(f"[b]Label:[/b]   {chunk['label']}")
-        if chunk.get("page") is not None:
-            lines.append(f"[b]Page:[/b]    {chunk['page']}")
+        if chunk.get("page_no") is not None:
+            lines.append(f"[b]Page:[/b]    {chunk['page_no']}")
 
         text = chunk.get("text", "")
         if text:

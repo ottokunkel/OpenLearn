@@ -1,5 +1,6 @@
 import logging
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -13,7 +14,7 @@ from docling.datamodel.pipeline_options import VlmConvertOptions, VlmPipelineOpt
 from docling.datamodel.vlm_engine_options import ApiVlmEngineOptions, VlmEngineType
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.pipeline.vlm_pipeline import VlmPipeline
-from docling_core.transforms.chunker import HierarchicalChunker
+from docling_core.transforms.chunker import HybridChunker
 
 from worker.config import Settings
 
@@ -201,7 +202,7 @@ class DoclingConverter:
         on_error: Optional[Callable[[int, str, bool], None]] = None,
         on_status: Optional[Callable[[int, int, int], None]] = None,
         cancel_event: Optional[Event] = None,
-    ) -> dict:
+    ) -> "ConversionResult":
         logger.info("Converting PDF: %s", file_path)
 
         with _patch_retries(
@@ -218,31 +219,49 @@ class DoclingConverter:
         markdown = doc.export_to_markdown()
         page_count = len(doc.pages) if hasattr(doc, "pages") else 0
 
-        # Hierarchical chunking
-        chunker = HierarchicalChunker()
-        chunks = []
-        for chunk in chunker.chunk(doc):
-            chunk_data = {
-                "text": chunk.text,
-                "headings": chunk.meta.headings,
-            }
-            if chunk.meta.doc_items:
-                item = chunk.meta.doc_items[0]
-                chunk_data["label"] = item.label if isinstance(item.label, str) else item.label.value
-                if item.prov:
-                    chunk_data["page"] = item.prov[0].page_no
-            chunks.append(chunk_data)
-
         logger.info(
-            "Conversion complete: %d pages, %d chunks, %d bytes markdown",
+            "Conversion complete: %d pages, %d bytes markdown",
             page_count,
-            len(chunks),
             len(markdown),
         )
 
+        def _chunk_iter() -> Iterator[dict]:
+            chunker = HybridChunker(merge_peers=True)
+            for chunk in chunker.chunk(doc):
+                chunk_data = {
+                    "text": chunk.text,
+                    "headings": chunk.meta.headings,
+                }
+                if chunk.meta.doc_items:
+                    item = chunk.meta.doc_items[0]
+                    chunk_data["label"] = item.label if isinstance(item.label, str) else item.label.value
+                    if item.prov:
+                        chunk_data["page_no"] = item.prov[0].page_no
+                yield chunk_data
+
+        return ConversionResult(
+            doc_dict=doc_dict,
+            markdown=markdown,
+            page_count=page_count,
+            chunk_iterator=_chunk_iter(),
+        )
+
+
+@dataclass
+class ConversionResult:
+    """Result of PDF conversion with lazy chunk iteration."""
+
+    doc_dict: dict
+    markdown: str
+    page_count: int
+    chunk_iterator: Iterator[dict]
+
+    def to_dict(self) -> dict:
+        """Materialize all chunks into a dict. For benchmark/testing use."""
+        chunks = list(self.chunk_iterator)
         return {
-            "doc_dict": doc_dict,
-            "markdown": markdown,
+            "doc_dict": self.doc_dict,
+            "markdown": self.markdown,
             "chunks": chunks,
-            "page_count": page_count,
+            "page_count": self.page_count,
         }
