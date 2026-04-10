@@ -1,25 +1,6 @@
 services:
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    profiles:
-      - redis
-
   document-worker:
     build: services/document-worker
     env_file: services/document-worker/.env
     restart: unless-stopped
-    # Redis mode: docker compose --profile redis up
-    # Supabase/pgmq mode: docker compose up document-worker
     # Scale: docker compose up --scale document-worker=3
-
-volumes:
-  redis-data:

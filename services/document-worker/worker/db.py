@@ -28,14 +28,17 @@ def create_pool(database_url: str, min_size: int = 2, max_size: int = 5) -> Conn
 # ---------------------------------------------------------------------------
 
 class PgmqQueue:
-    """Drop-in replacement for RedisQueue that reads from a pgmq queue."""
+    """Reads jobs from a pgmq queue backed by Postgres."""
 
     def __init__(self, pool: ConnectionPool, queue_name: str = "document_jobs"):
         self._pool = pool
         self._queue = queue_name
 
     def wait_for_job(self, timeout: int = 5) -> tuple[int, dict] | None:
-        """Poll pgmq for one message. Returns (msg_id, job_dict) or None."""
+        """Poll pgmq for one message. Returns (msg_id, job_dict) or None.
+
+        If timeout is 0, returns immediately without sleeping on empty queue.
+        """
         with self._pool.connection() as conn:
             row = conn.execute(
                 "SELECT * FROM pgmq.read(%s, %s, %s)",
@@ -43,7 +46,8 @@ class PgmqQueue:
             ).fetchone()
 
         if row is None:
-            time.sleep(min(timeout, 2))
+            if timeout > 0:
+                time.sleep(min(timeout, 2))
             return None
 
         msg = row["message"]

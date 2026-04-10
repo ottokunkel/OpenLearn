@@ -5,9 +5,6 @@ from dataclasses import dataclass, field
 
 @dataclass(frozen=True)
 class Settings:
-    # Redis
-    redis_url: str = "redis://localhost:6379/0"
-    input_queue: str = "docling:jobs"
     # S3-compatible storage
     s3_endpoint_url: str = ""
     s3_region: str = "us-east-1"
@@ -32,7 +29,7 @@ class Settings:
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
     embedding_batch_size: int = 100
-    # Supabase / Postgres (set database_url to enable, replaces Redis)
+    # Supabase / Postgres
     database_url: str = ""
     supabase_url: str = ""
     supabase_service_key: str = ""
@@ -40,8 +37,6 @@ class Settings:
 
 def load_settings() -> Settings:
     return Settings(
-        redis_url=os.environ.get("REDIS_URL", "redis://localhost:6379/0"),
-        input_queue=os.environ.get("INPUT_QUEUE", "docling:jobs"),
         s3_endpoint_url=os.environ.get("S3_ENDPOINT_URL", ""),
         s3_region=os.environ.get("S3_REGION", "us-east-1"),
         s3_access_key=os.environ.get("S3_ACCESS_KEY", ""),
