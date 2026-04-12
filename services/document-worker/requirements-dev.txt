@@ -1,4 +1,0 @@
-pytest>=8.0
-pytest-mock>=3.14
-responses>=0.25
-moto[s3]>=5.0
