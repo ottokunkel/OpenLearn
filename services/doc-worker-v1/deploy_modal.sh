@@ -1,0 +1,1 @@
+modal deploy src/VLMEndpoints/Modal/modal_app.py

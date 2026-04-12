@@ -1,0 +1,61 @@
+# Benchmark config for the hosted VLM on Modal.
+#
+# Environment-variable substitution is supported with:
+#     ${VAR}              -> value of VAR (empty if unset)
+#     ${VAR:-default}     -> value of VAR, falling back to `default`
+#
+# Override anything at the command line by exporting the corresponding env var,
+# e.g. `GPU_PRICE_PER_HOUR=1.95 python benchmarks/benchmark_vlm_modal.py`.
+
+modal:
+  app_name: ${BENCH_APP_NAME:-vlm-endpoint-docworker-v1}
+  class_name: ${BENCH_CLASS_NAME:-VllmServer}
+
+  # `scaledown_window` is the number of seconds Modal keeps a container alive
+  # after its last request. You pay GPU-seconds for this window, so making it
+  # shorter speeds up benchmark turnaround AND reduces cost-per-benchmark.
+  #
+  # NOTE: this value must match what is actually deployed (SCALEDOWN_WINDOW in
+  # src/VLMEndpoints/Modal/modal_app.py). Change it there and redeploy to
+  # actually shorten the wait. The value here is used for:
+  #   1. cost estimation (adds to billed GPU-time)
+  #   2. knowing how long to poll when waiting for containers to die off
+  deployed_scaledown_window_s: ${BENCH_SCALEDOWN:-2}
+
+model:
+  name: ${BENCH_MODEL_NAME:-ibm-granite/granite-docling-258M}
+
+request:
+  # Same image as tests/test_modal.py
+  image: ${BENCH_IMAGE_URL:-https://huggingface.co/ibm-granite/granite-docling-258M/resolve/main/assets/new_arxiv.png}
+  prompt: ${BENCH_PROMPT:-Convert this image to Docling.}
+
+  # Per-request HTTP timeout. Should comfortably exceed worst-case cold start.
+  request_timeout_s: ${BENCH_REQUEST_TIMEOUT:-600}
+
+benchmark:
+  # How many warm requests to fire after the cold-start request.
+  warm_requests: ${BENCH_WARM_REQUESTS:-10}
+
+  # Parallelism for warm requests. 1 = strictly sequential.
+  concurrency: ${BENCH_CONCURRENCY:-1}
+
+  # If true, poll the Modal API and wait for zero running runners before the
+  # cold-start request, so the first request truly hits a cold boot.
+  require_cold: ${BENCH_REQUIRE_COLD:-true}
+
+  # Polling cadence while waiting for runners to scale to 0.
+  poll_interval_s: ${BENCH_POLL_INTERVAL:-5}
+
+  # Give up waiting for cold after this many seconds.
+  max_cold_wait_s: ${BENCH_MAX_COLD_WAIT:-120}
+
+cost:
+  gpu: ${BENCH_GPU:-L40S}
+
+  # Modal GPU $/hour. Check https://modal.com/pricing for current rates.
+  gpu_price_per_hour: ${GPU_PRICE_PER_HOUR:-1.95}
+
+  # If true, add `deployed_scaledown_window_s` to the measured active time
+  # when estimating cost (you pay for that idle window).
+  include_scaledown: ${BENCH_INCLUDE_SCALEDOWN:-true}

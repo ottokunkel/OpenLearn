@@ -1,0 +1,13 @@
+[project]
+name = "doc-worker-v1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp>=3.13.5",
+    "modal>=1.4.1",
+    "openai>=2.31.0",
+    "pyyaml>=6.0.2",
+    "requests>=2.33.1",
+]
