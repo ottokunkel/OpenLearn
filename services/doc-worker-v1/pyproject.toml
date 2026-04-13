@@ -6,8 +6,27 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "aiohttp>=3.13.5",
+    "docling>=2.60.0",
     "modal>=1.4.1",
     "openai>=2.31.0",
+    "python-dotenv>=1.0.1",
     "pyyaml>=6.0.2",
     "requests>=2.33.1",
+    "supabase>=2.11.0",
+]
+
+[project.scripts]
+docling-worker = "DoclingWorker.__main__:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+markers = [
+    "integration: end-to-end tests that hit live Modal + Supabase (gated by RUN_INTEGRATION_TESTS=1)",
 ]
