@@ -45,7 +45,7 @@ def build_converter(cfg: Config) -> DocumentConverter:
     )
 
 
-def convert_pdf_bytes(
+def convert_pdf(
     converter: DocumentConverter,
     pdf_bytes: bytes,
 ) -> tuple[str, dict[str, Any], int]:

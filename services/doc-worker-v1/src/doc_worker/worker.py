@@ -1,25 +1,24 @@
-"""Polling loop entry point. Run with: ``python -m DoclingWorker``."""
+"""Polling loop entry point."""
 from __future__ import annotations
 
 import logging
 import signal
-import sys
 import time
 
 from . import config as config_mod
-from . import job_processor, queue, supabase_client
-from .docling_runner import build_converter
+from . import processor, queue, supabase
+from .docling import build_converter
 
 
-def main() -> int:
+def run() -> int:
     cfg = config_mod.load()
     logging.basicConfig(
         level=cfg.log_level,
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
-    log = logging.getLogger("DoclingWorker")
+    log = logging.getLogger("doc_worker")
 
-    client = supabase_client.get_client(cfg)
+    client = supabase.get_client(cfg)
     converter = build_converter(cfg)
 
     stop = False
@@ -48,11 +47,7 @@ def main() -> int:
         for msg in msgs:
             if stop:
                 break
-            job_processor.process(msg, client, converter)
+            processor.process(msg, client, converter, max_retries=cfg.max_retries)
 
     log.info("worker exited cleanly")
     return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

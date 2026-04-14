@@ -20,7 +20,7 @@ pytestmark = pytest.mark.integration
     reason="set RUN_INTEGRATION_TESTS=1 to hit live Modal + Supabase",
 )
 def test_gaussians_end_to_end(client, converter, seeded_document):
-    from DoclingWorker import job_processor, queue
+    from doc_worker import processor, queue
 
     document_id = seeded_document["document_id"]
 
@@ -38,7 +38,7 @@ def test_gaussians_end_to_end(client, converter, seeded_document):
     assert my_msg is not None, "did not find seeded message on the queue"
 
     # Run one job synchronously end-to-end.
-    job_processor.process(my_msg, client, converter)
+    processor.process(my_msg, client, converter)
 
     # --- DB assertions -----------------------------------------------------
     row = (

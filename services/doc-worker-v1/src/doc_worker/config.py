@@ -17,6 +17,7 @@ class Config:
     poll_interval_s: float
     visibility_timeout_s: int
     batch_size: int
+    max_retries: int
     log_level: str
 
 
@@ -40,5 +41,6 @@ def load() -> Config:
         poll_interval_s=float(os.environ.get("WORKER_POLL_INTERVAL_S", "5")),
         visibility_timeout_s=int(os.environ.get("WORKER_VISIBILITY_TIMEOUT_S", "300")),
         batch_size=int(os.environ.get("WORKER_BATCH_SIZE", "1")),
+        max_retries=int(os.environ.get("WORKER_MAX_RETRIES", "3")),
         log_level=os.environ.get("LOG_LEVEL", "INFO"),
     )

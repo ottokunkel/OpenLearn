@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-docling-worker = "DoclingWorker.__main__:main"
+doc-worker = "doc_worker.worker:run"
 
 [build-system]
 requires = ["setuptools>=69"]

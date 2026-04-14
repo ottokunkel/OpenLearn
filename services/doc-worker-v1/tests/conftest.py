@@ -18,21 +18,21 @@ FIXTURE_PATH = Path(__file__).parent / "fixtures" / "gaussians.pdf"
 
 @pytest.fixture(scope="session")
 def cfg():
-    from DoclingWorker import config as config_mod
+    from doc_worker import config as config_mod
 
     return config_mod.load()
 
 
 @pytest.fixture(scope="session")
 def client(cfg):
-    from DoclingWorker import supabase_client
+    from doc_worker import supabase
 
-    return supabase_client.get_client(cfg)
+    return supabase.get_client(cfg)
 
 
 @pytest.fixture(scope="session")
 def converter(cfg):
-    from DoclingWorker.docling_runner import build_converter
+    from doc_worker.docling import build_converter
 
     return build_converter(cfg)
 
