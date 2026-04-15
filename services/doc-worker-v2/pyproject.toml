@@ -1,0 +1,28 @@
+[project]
+name = "doc-worker-v2"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "docling>=2.60,<3",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+    "python-dotenv>=1.0",
+    "storage-supabase",
+]
+
+[project.optional-dependencies]
+postgres = ["storage-postgres"]
+
+[project.scripts]
+doc-worker-v2 = "doc_worker_v2.worker:run"
+
+[tool.uv.sources]
+storage-supabase = { workspace = true }
+storage-postgres = { workspace = true }
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

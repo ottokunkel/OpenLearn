@@ -21,7 +21,7 @@ import modal
 
 MINUTES = 60
 PORT = 8000
-APP_NAME = "vlm-endpoint-docworker-v1"
+APP_NAME = "vlm-granite-docling"
 
 MODEL_NAME = "ibm-granite/granite-docling-258M"
 MODEL_REVISION = "55d41aa24c0be047c7e4ed89b51058ea586b0428"
@@ -31,10 +31,10 @@ N_GPU = 1
 REGION = "us-east"
 
 MIN_CONTAINERS = 0                  # set to 1 to always keep a warm replica
-MAX_INPUTS = 4                      # concurrent requests per replica before scaling up
+MAX_INPUTS = 32                     # concurrent requests per replica before scaling up
 FAST_BOOT = False                   # disables graph building on startup
-SCALEDOWN_WINDOW = 2                # time till container is scaled down 
-TIMEOUT = 2 * MINUTES               # time till execution fails 
+SCALEDOWN_WINDOW = 2                # time till container is scaled down
+TIMEOUT = 2 * MINUTES               # time till execution fails
 STARTUP_TIMEOUT = 3 * MINUTES       # time till startup fails
 
 # vLLM specific
@@ -61,7 +61,7 @@ vllm_image = (
     .env({
         "VLLM_SERVER_DEV_MODE": "1",            # allows us to toggle server in and out of sleep mode for snapshot compatibility
         "HF_XET_HIGH_PERFORMANCE": "1",         # faster model transfers
-        "TORCHINDUCTOR_COMPILE_THREADS": "1",   # improve compatibility with snapshots  
+        "TORCHINDUCTOR_COMPILE_THREADS": "1",   # improve compatibility with snapshots
     })
 )
 

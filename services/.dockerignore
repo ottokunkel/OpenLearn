@@ -1,0 +1,18 @@
+# .dockerignore at the workspace root (build context).
+# Keeps ML weights, virtualenvs, and v1 (which we don't need at runtime) out
+# of the Docker build context.
+
+doc-worker-v1/
+vlm-endpoints/
+
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/.venv
+**/*.egg-info
+
+**/tests/fixtures/*.pdf
+**/.env
+**/.env.*
+!**/.env.example
